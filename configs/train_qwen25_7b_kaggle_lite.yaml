@@ -1,8 +1,8 @@
 model:
   name: Qwen/Qwen2.5-7B-Instruct
   load_in_4bit: true
-  attn_implementation: flash_attention_2  # Better GPU utilization than sdpa
-  device_map: auto  # Distribute across available GPUs
+  attn_implementation: flash_attention_2
+  device_map: auto
 
 data:
   csv_path: /kaggle/input/medical-qa/train.csv
