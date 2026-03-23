@@ -1,0 +1,70 @@
+model:
+  name: Qwen/Qwen2.5-7B-Instruct
+  load_in_4bit: true
+  attn_implementation: flash_attention_2
+  device_map: "0"  # Single GPU RTX 3060
+
+data:
+  csv_path: ./data/train/train.csv
+  question_col: Question
+  answer_col: Answer
+  val_size: 0.1
+  max_seq_length: 512  # Reduced for RTX 3060 12GB VRAM
+  packing: true
+  limit_rows: null
+  system_prompt: |
+    You are a careful and evidence-aware medical assistant.
+      - Provide safe, educational, and concise answers.
+      - If a question can be dangerous, recommend consulting a licensed clinician.
+
+    Always follow this structure:
+
+      - Symptom analysis
+      - Differential diagnosis (list possible diagnoses)
+      - Recommendations (including when to seek medical attention)
+
+    If information is missing, ask further questions before drawing conclusions.
+
+
+lora:
+  r: 8  # Reduced rank for RTX 3060
+  alpha: 16
+  dropout: 0.05
+  bias: none
+  target_modules:
+    - q_proj
+    - k_proj
+    - v_proj
+    - o_proj
+    - gate_proj
+    - up_proj
+    - down_proj
+
+training:
+  seed: 42
+  output_dir: ./outputs/qwen25_7b_medqa_lora_rtx3060
+  per_device_train_batch_size: 2  # Small batch for 12GB VRAM
+  per_device_eval_batch_size: 2
+  gradient_accumulation_steps: 8  # Effective batch size = 2 * 8 = 16
+  num_train_epochs: 3
+  learning_rate: 2.0e-4
+  warmup_ratio: 0.03
+  logging_steps: 20
+  eval_strategy: steps
+  eval_steps: 100
+  save_strategy: steps
+  save_steps: 100
+  save_total_limit: 2
+  lr_scheduler_type: cosine
+  gradient_checkpointing: true
+  report_to: tensorboard
+  optim: paged_adamw_8bit
+  tf32: true
+  bf16: false
+  fp16: true
+  group_by_length: true
+  dataloader_num_workers: 0  # Set to 0 on Windows for stability
+  dataloader_pin_memory: false
+  dataloader_persistent_workers: false
+  save_safetensors: true
+  torch_compile: false
