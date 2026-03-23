@@ -318,3 +318,20 @@ pip install -r requirements.txt
 python -m src.train_lora --config configs/train_qwen25_7b_lora.yaml
 ```
 
+## 7) Kaggle notebook (lite GPU)
+
+If you want to train on a lighter Kaggle GPU (T4/P100/L4), use:
+- `configs/train_qwen25_7b_kaggle_lite.yaml`
+- `notebooks/kaggle_train_qwen25_7b_lite.ipynb`
+
+Quick flow on Kaggle:
+1. Create a new Kaggle Notebook with GPU enabled.
+2. Add your dataset so CSV is available at `/kaggle/input/.../train.csv`.
+3. Upload this repository into `/kaggle/working/Qwen2.5B_finetune` (or clone it).
+4. Open and run all cells in `notebooks/kaggle_train_qwen25_7b_lite.ipynb`.
+
+Notes:
+- The notebook writes a runtime config at `/kaggle/working/train_qwen25_7b_kaggle_runtime.yaml`.
+- Default output path is `/kaggle/working/outputs/qwen25_7b_medqa_lora_kaggle`.
+- It also zips artifacts to `/kaggle/working/qwen25_7b_medqa_lora_kaggle.zip` for download.
+

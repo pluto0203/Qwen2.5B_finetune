@@ -1,0 +1,68 @@
+model:
+  name: Qwen/Qwen2.5-7B-Instruct
+  load_in_4bit: true
+  attn_implementation: sdpa
+
+data:
+  csv_path: /kaggle/input/medical-qa/train.csv
+  question_col: Question
+  answer_col: Answer
+  val_size: 0.03
+  max_seq_length: 1024
+  packing: true
+  # Set to a number like 5000 for very fast dry-runs on Kaggle
+  limit_rows: null
+  system_prompt: |
+    You are a careful and evidence-aware medical assistant.
+      - Provide safe, educational, and concise answers.
+      - If a question can be dangerous, recommend consulting a licensed clinician.
+
+    Always follow this structure:
+
+      - Symptom analysis
+      - Differential diagnosis (list possible diagnoses)
+      - Recommendations (including when to seek medical attention)
+
+    If information is missing, ask further questions before drawing conclusions.
+
+lora:
+  r: 16
+  alpha: 32
+  dropout: 0.05
+  bias: none
+  target_modules:
+    - q_proj
+    - k_proj
+    - v_proj
+    - o_proj
+    - gate_proj
+    - up_proj
+    - down_proj
+
+training:
+  seed: 42
+  output_dir: /kaggle/working/outputs/qwen25_7b_medqa_lora_kaggle
+  per_device_train_batch_size: 1
+  per_device_eval_batch_size: 1
+  gradient_accumulation_steps: 16
+  num_train_epochs: 1
+  learning_rate: 2.0e-4
+  warmup_ratio: 0.03
+  logging_steps: 10
+  eval_strategy: steps
+  eval_steps: 100
+  save_strategy: steps
+  save_steps: 100
+  save_total_limit: 2
+  lr_scheduler_type: cosine
+  gradient_checkpointing: true
+  report_to: tensorboard
+  optim: paged_adamw_32bit
+  tf32: true
+  bf16: false
+  fp16: true
+  group_by_length: true
+  dataloader_num_workers: 2
+  dataloader_pin_memory: true
+  dataloader_persistent_workers: false
+  save_safetensors: true
