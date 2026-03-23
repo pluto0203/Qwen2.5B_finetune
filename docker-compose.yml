@@ -17,9 +17,10 @@ services:
       - PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
       - NVIDIA_TF32_OVERRIDE=1
       - TOKENIZERS_PARALLELISM=false
+      - NVIDIA_VISIBLE_DEVICES=all
+    runtime: nvidia
     ports:
       - "6006:6006"
-    gpus: all
     ipc: host
     shm_size: "64gb"
     ulimits:
