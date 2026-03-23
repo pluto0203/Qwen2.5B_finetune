@@ -127,13 +127,14 @@ def main() -> None:
         tokenizer.pad_token = tokenizer.eos_token
 
     attn_backend = resolve_attention_backend(cfg["model"].get("attn_implementation", "sdpa"))
+    device_map = cfg["model"].get("device_map", "auto")
 
     model = AutoModelForCausalLM.from_pretrained(
         model_name,
         trust_remote_code=True,
         quantization_config=bnb_config,
         torch_dtype=compute_dtype,
-        device_map="auto",
+        device_map=device_map,
         attn_implementation=attn_backend,
     )
     logger.info("Using attention backend: %s", attn_backend)

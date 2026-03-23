@@ -1,7 +1,8 @@
 model:
   name: Qwen/Qwen2.5-7B-Instruct
   load_in_4bit: true
-  attn_implementation: sdpa
+  attn_implementation: flash_attention_2  # Better GPU utilization than sdpa
+  device_map: auto  # Distribute across available GPUs
 
 data:
   csv_path: /kaggle/input/medical-qa/train.csv
@@ -58,12 +59,13 @@ training:
   lr_scheduler_type: cosine
   gradient_checkpointing: true
   report_to: tensorboard
-  optim: paged_adamw_32bit
-  tf32: true
-  bf16: false
+  optim: paged_adamw_8bit  # More memory efficient for Kaggle T4 GPUs
+  tf32: true  # Critical for T4 GPU performance
+  bf16: false  # T4 doesn't support bf16 well, use fp16 instead
   fp16: true
   group_by_length: true
   dataloader_num_workers: 2
   dataloader_pin_memory: true
   dataloader_persistent_workers: false
   save_safetensors: true
+  torch_compile: false  # Disable for stability on Kaggle
