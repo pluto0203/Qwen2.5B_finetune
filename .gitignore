@@ -24,13 +24,13 @@ Thumbs.db
 .env.*
 !.env.example
 
-# Logs
-*.log
-logs/
+# # Logs
+# *.log
+# logs/
 
-# Training artifacts
-outputs/
-checkpoints/
+# # Training artifacts
+# outputs/
+# checkpoints/
 
 # Hugging Face / model cache
 .cache/

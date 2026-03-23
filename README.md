@@ -22,6 +22,8 @@ CSV required columns:
 - `src/data.py`: CSV to chat-format dataset conversion
 - `src/merge_lora.py`: optional adapter merge into base model
 - `configs/train_qwen25_7b_lora.yaml`: training config
+- `configs/train_qwen25_7b_kaggle_lite.yaml`: base config for Kaggle low-VRAM mode
+- `notebooks/kaggle_train_qwen25_7b_lite.ipynb`: end-to-end Kaggle notebook for lighter GPUs
 - `Dockerfile` + `docker-compose.yml`: GPU-ready containerized run
 - `scripts/cloud_vm_setup_ubuntu.sh`: one-time Docker + NVIDIA runtime setup for Ubuntu VM
 
@@ -318,20 +320,17 @@ pip install -r requirements.txt
 python -m src.train_lora --config configs/train_qwen25_7b_lora.yaml
 ```
 
-## 7) Kaggle notebook (lite GPU)
+## 7) Kaggle Lite notebook (T4/P100)
 
-If you want to train on a lighter Kaggle GPU (T4/P100/L4), use:
-- `configs/train_qwen25_7b_kaggle_lite.yaml`
-- `notebooks/kaggle_train_qwen25_7b_lite.ipynb`
+Use [notebooks/kaggle_train_qwen25_7b_lite.ipynb](notebooks/kaggle_train_qwen25_7b_lite.ipynb) when running on lighter Kaggle GPUs.
 
-Quick flow on Kaggle:
-1. Create a new Kaggle Notebook with GPU enabled.
-2. Add your dataset so CSV is available at `/kaggle/input/.../train.csv`.
-3. Upload this repository into `/kaggle/working/Qwen2.5B_finetune` (or clone it).
-4. Open and run all cells in `notebooks/kaggle_train_qwen25_7b_lite.ipynb`.
+Cell order:
+1. Cell 1: overview
+2. Cell 2: GPU check (`nvidia-smi`)
+3. Cell 3: clone/update repo + install dependencies
+4. Cell 4: generate runtime config with lite profile
+5. Cell 5: start training
+6. Cell 6: inspect metrics/log outputs
 
-Notes:
-- The notebook writes a runtime config at `/kaggle/working/train_qwen25_7b_kaggle_runtime.yaml`.
-- Default output path is `/kaggle/working/outputs/qwen25_7b_medqa_lora_kaggle`.
-- It also zips artifacts to `/kaggle/working/qwen25_7b_medqa_lora_kaggle.zip` for download.
+The notebook creates `configs/train_qwen25_7b_kaggle_lite_runtime.yaml` automatically, so your base config remains unchanged.
 
