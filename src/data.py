@@ -13,7 +13,7 @@ class DataConfig:
     csv_path: str
     question_col: str = "Question"
     answer_col: str = "Answer"
-    val_size: float = 0.02
+    val_size: float = 0.03
     seed: int = 42
 
 

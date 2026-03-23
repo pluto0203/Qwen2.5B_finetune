@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import importlib.util
 import json
 import logging
 import os
@@ -66,6 +67,15 @@ def configure_file_logging(output_dir: str) -> str:
     return train_log_file
 
 
+def resolve_attention_backend(requested: str) -> str:
+    if requested != "auto":
+        return requested
+
+    if importlib.util.find_spec("flash_attn") is not None:
+        return "flash_attention_2"
+    return "sdpa"
+
+
 def main() -> None:
     args = parse_args()
 
@@ -85,7 +95,19 @@ def main() -> None:
     logger.info("Text log file: %s", train_log_file)
 
     use_bf16 = torch.cuda.is_available() and torch.cuda.is_bf16_supported()
+    cfg_bf16 = cfg["training"].get("bf16")
+    if cfg_bf16 is not None:
+        use_bf16 = bool(cfg_bf16) and torch.cuda.is_available()
+
     compute_dtype = torch.bfloat16 if use_bf16 else torch.float16
+    use_fp16 = bool(cfg["training"].get("fp16", not use_bf16))
+
+    if torch.cuda.is_available():
+        # Hopper benefits from TF32 for matmul-heavy kernels while keeping numerics stable.
+        enable_tf32 = bool(cfg["training"].get("tf32", True))
+        torch.backends.cuda.matmul.allow_tf32 = enable_tf32
+        torch.backends.cudnn.allow_tf32 = enable_tf32
+        torch.set_float32_matmul_precision("high")
 
     bnb_config = None
     if cfg["model"].get("load_in_4bit", True):
@@ -104,14 +126,17 @@ def main() -> None:
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
 
+    attn_backend = resolve_attention_backend(cfg["model"].get("attn_implementation", "sdpa"))
+
     model = AutoModelForCausalLM.from_pretrained(
         model_name,
         trust_remote_code=True,
         quantization_config=bnb_config,
         torch_dtype=compute_dtype,
         device_map="auto",
-        attn_implementation=cfg["model"].get("attn_implementation", "sdpa"),
+        attn_implementation=attn_backend,
     )
+    logger.info("Using attention backend: %s", attn_backend)
 
     if cfg["training"].get("gradient_checkpointing", True):
         model.config.use_cache = False
@@ -160,12 +185,31 @@ def main() -> None:
         "max_seq_length": int(cfg["data"].get("max_seq_length", 2048)),
         "packing": bool(cfg["data"].get("packing", False)),
         "bf16": use_bf16,
-        "fp16": not use_bf16,
+        "fp16": use_fp16,
         "gradient_checkpointing": bool(cfg["training"].get("gradient_checkpointing", True)),
         "report_to": cfg["training"].get("report_to", "none"),
         "remove_unused_columns": False,
         "dataset_text_field": "text",
     }
+
+    optional_training_keys = [
+        "optim",
+        "tf32",
+        "torch_compile",
+        "torch_compile_backend",
+        "bf16_full_eval",
+        "group_by_length",
+        "dataloader_num_workers",
+        "dataloader_pin_memory",
+        "dataloader_persistent_workers",
+        "save_safetensors",
+        "weight_decay",
+        "max_grad_norm",
+    ]
+    available_fields = getattr(SFTConfig, "__dataclass_fields__", {})
+    for key in optional_training_keys:
+        if key in cfg["training"] and key in available_fields:
+            sft_kwargs[key] = cfg["training"][key]
 
     eval_strategy = cfg["training"].get("eval_strategy", "steps")
     if "eval_strategy" in getattr(SFTConfig, "__dataclass_fields__", {}):
@@ -179,7 +223,7 @@ def main() -> None:
 
     trainer = SFTTrainer(
         model=model,
-        tokenizer=tokenizer,
+        processing_class=tokenizer,
         train_dataset=dataset["train"],
         eval_dataset=dataset["validation"],
         peft_config=lora_cfg,
