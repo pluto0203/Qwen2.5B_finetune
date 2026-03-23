@@ -1,0 +1,21 @@
+services:
+  qwen-finetune:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: qwen25-7b-medqa:latest
+    container_name: qwen25-7b-medqa
+    working_dir: /workspace
+    volumes:
+      - ./:/workspace
+      - ./outputs:/workspace/outputs
+      - ./data:/workspace/data
+      - ./.cache:/workspace/.cache
+    environment:
+      - HF_TOKEN=${HF_TOKEN:-}
+      - CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES:-0}
+    ports:
+      - "6006:6006"
+    gpus: all
+    shm_size: "16gb"
+    command: bash scripts/train.sh configs/train_qwen25_7b_lora.yaml

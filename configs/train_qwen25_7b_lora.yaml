@@ -1,0 +1,59 @@
+model:
+  name: Qwen/Qwen2.5-7B-Instruct
+  load_in_4bit: true
+  attn_implementation: sdpa
+
+data:
+  csv_path: data/train/train.csv
+  question_col: Question
+  answer_col: Answer
+  val_size: 0.03
+  max_seq_length: 2048
+  packing: false
+  # Set a lower value for quick smoke tests, e.g. 500
+  limit_rows: null
+  system_prompt: |
+    You are a careful and evidence-aware medical assistant.
+      - Provide safe, educational, and concise answers.
+      - If a question can be dangerous, recommend consulting a licensed clinician.
+
+    Always follow this structure:
+
+      - Symptom analysis
+      - Differential diagnosis (list possible diagnoses)
+      - Recommendations (including when to seek medical attention)
+
+    If information is missing, ask further questions before drawing conclusions.
+
+lora:
+  r: 16
+  alpha: 32
+  dropout: 0.05
+  bias: none
+  target_modules:
+    - q_proj
+    - k_proj
+    - v_proj
+    - o_proj
+    - gate_proj
+    - up_proj
+    - down_proj
+
+training:
+  seed: 42
+  output_dir: outputs/qwen25_7b_medqa_lora
+  per_device_train_batch_size: 1
+  per_device_eval_batch_size: 1
+  gradient_accumulation_steps: 16
+  num_train_epochs: 2
+  learning_rate: 2.0e-4
+  warmup_ratio: 0.03
+  logging_steps: 10
+  eval_strategy: steps
+  eval_steps: 100
+  save_strategy: steps
+  save_steps: 100
+  save_total_limit: 3
+  lr_scheduler_type: cosine
+  gradient_checkpointing: true
+  report_to: tensorboard
