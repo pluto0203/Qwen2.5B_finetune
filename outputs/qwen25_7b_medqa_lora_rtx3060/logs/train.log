@@ -1,0 +1,6 @@
+2026-03-23 10:12:23,919 | INFO | __main__ | Loading config from configs/train_qwen25_7b_rtx3060.yaml
+2026-03-23 10:12:23,920 | INFO | __main__ | Artifacts will be saved under ./outputs/qwen25_7b_medqa_lora_rtx3060
+2026-03-23 10:12:23,920 | INFO | __main__ | Text log file: ./outputs/qwen25_7b_medqa_lora_rtx3060/logs/train.log
+2026-03-23 10:14:20,677 | INFO | __main__ | Loading config from configs/train_qwen25_7b_rtx3060.yaml
+2026-03-23 10:14:20,677 | INFO | __main__ | Artifacts will be saved under ./outputs/qwen25_7b_medqa_lora_rtx3060
+2026-03-23 10:14:20,678 | INFO | __main__ | Text log file: ./outputs/qwen25_7b_medqa_lora_rtx3060/logs/train.log

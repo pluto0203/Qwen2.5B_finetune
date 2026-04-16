@@ -10,6 +10,8 @@ data:
   answer_col: Answer
   val_size: 0.03
   max_seq_length: 1024
+  max_answer_chars: 2000
+  dedupe_on_answer: true
   packing: true
   # Set to a number like 5000 for very fast dry-runs on Kaggle
   limit_rows: null

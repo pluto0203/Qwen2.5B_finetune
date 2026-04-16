@@ -26,4 +26,4 @@ services:
     ulimits:
       memlock: -1
       stack: 67108864
-    command: bash scripts/train.sh configs/train_qwen25_7b_lora.yaml
+    command: bash scripts/train.sh configs/train_qwen25_7b_laptop6gb_qlora.yaml

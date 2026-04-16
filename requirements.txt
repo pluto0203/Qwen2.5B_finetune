@@ -1,10 +1,10 @@
 torch>=2.4.0
-transformers==4.51.0
+transformers==4.51.3        # dùng patch mới nhất trong nhánh 4.51
 datasets==3.5.0
-trl==0.16.1
-peft==0.15.1
-accelerate==1.6.0
-bitsandbytes==0.45.5
+trl==0.15.2                 # ổn định hơn 0.16.x với transformers 4.51
+peft==0.14.0                # được xác nhận bởi Google AI Feb 2026
+accelerate==1.4.0           # được xác nhận bởi Google AI Feb 2026
+bitsandbytes==0.45.3        # ổn định trong nhánh 0.45
 pandas>=2.2.2
 scikit-learn>=1.5.1
 pyyaml>=6.0.2

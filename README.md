@@ -23,6 +23,7 @@ CSV required columns:
 - `src/merge_lora.py`: optional adapter merge into base model
 - `configs/train_qwen25_7b_lora.yaml`: training config
 - `configs/train_qwen25_7b_kaggle_lite.yaml`: base config for Kaggle low-VRAM mode
+- `configs/train_qwen25_7b_laptop6gb_qlora.yaml`: recommended QLoRA config for 6GB laptop GPUs
 - `notebooks/kaggle_train_qwen25_7b_lite.ipynb`: end-to-end Kaggle notebook for lighter GPUs
 - `Dockerfile` + `docker-compose.yml`: GPU-ready containerized run
 - `scripts/cloud_vm_setup_ubuntu.sh`: one-time Docker + NVIDIA runtime setup for Ubuntu VM
@@ -203,6 +204,12 @@ Or run the training command explicitly:
 
 ```bash
 docker compose run --rm qwen-finetune bash scripts/train.sh configs/train_qwen25_7b_lora.yaml
+```
+
+For 6GB laptop GPUs (QLoRA), use:
+
+```bash
+docker compose run --rm qwen-finetune bash scripts/train.sh configs/train_qwen25_7b_laptop6gb_qlora.yaml
 ```
 
 ### Step 11: Monitor logs during training

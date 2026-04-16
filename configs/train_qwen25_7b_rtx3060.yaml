@@ -1,15 +1,17 @@
 model:
   name: Qwen/Qwen2.5-7B-Instruct
   load_in_4bit: true
-  attn_implementation: flash_attention_2
-  device_map: "0"  # Single GPU RTX 3060
+  attn_implementation: eager  # flash_attention_2 cần cài thêm, dễ lỗi
+  device_map: cuda:0
 
 data:
-  csv_path: ./data/train/train.csv
+  csv_path: ./data/train/train_1.csv
   question_col: Question
   answer_col: Answer
   val_size: 0.1
-  max_seq_length: 512  # Reduced for RTX 3060 12GB VRAM
+  max_seq_length: 512
+  max_answer_chars: 2000
+  dedupe_on_answer: true
   packing: true
   limit_rows: null
   system_prompt: |
@@ -25,9 +27,8 @@ data:
 
     If information is missing, ask further questions before drawing conclusions.
 
-
 lora:
-  r: 8  # Reduced rank for RTX 3060
+  r: 8
   alpha: 16
   dropout: 0.05
   bias: none
@@ -43,9 +44,9 @@ lora:
 training:
   seed: 42
   output_dir: ./outputs/qwen25_7b_medqa_lora_rtx3060
-  per_device_train_batch_size: 2  # Small batch for 12GB VRAM
-  per_device_eval_batch_size: 2
-  gradient_accumulation_steps: 8  # Effective batch size = 2 * 8 = 16
+  per_device_train_batch_size: 1    # ⬇ 2→1 tránh OOM
+  per_device_eval_batch_size: 1
+  gradient_accumulation_steps: 16   # giữ effective batch = 16
   num_train_epochs: 3
   learning_rate: 2.0e-4
   warmup_ratio: 0.03
@@ -59,11 +60,11 @@ training:
   gradient_checkpointing: true
   report_to: tensorboard
   optim: paged_adamw_8bit
-  tf32: true
+  tf32: false   # ⬇ tắt đi, laptop thường không ổn định với tf32
   bf16: false
   fp16: true
   group_by_length: true
-  dataloader_num_workers: 0  # Set to 0 on Windows for stability
+  dataloader_num_workers: 0
   dataloader_pin_memory: false
   dataloader_persistent_workers: false
   save_safetensors: true

@@ -1,0 +1,39 @@
+2026-03-24 00:37:43,523 | INFO | __main__ | Loading config from configs\train_qwen25_7b_laptop6gb_qlora.yaml
+2026-03-24 00:37:43,523 | INFO | __main__ | Artifacts will be saved under ./outputs/qwen25_7b_medqa_lora_laptop6gb
+2026-03-24 00:37:43,523 | INFO | __main__ | Text log file: ./outputs/qwen25_7b_medqa_lora_laptop6gb\logs\train.log
+2026-03-24 00:37:50,515 | WARNING | huggingface_hub.file_download | Xet Storage is enabled for this repo, but the 'hf_xet' package is not installed. Falling back to regular HTTP download. For better performance, install the package with: `pip install huggingface_hub[hf_xet]` or `pip install hf_xet`
+2026-03-24 00:37:50,520 | WARNING | huggingface_hub.file_download | Xet Storage is enabled for this repo, but the 'hf_xet' package is not installed. Falling back to regular HTTP download. For better performance, install the package with: `pip install huggingface_hub[hf_xet]` or `pip install hf_xet`
+2026-03-24 00:37:50,527 | WARNING | huggingface_hub.file_download | Xet Storage is enabled for this repo, but the 'hf_xet' package is not installed. Falling back to regular HTTP download. For better performance, install the package with: `pip install huggingface_hub[hf_xet]` or `pip install hf_xet`
+2026-03-24 00:37:50,530 | WARNING | huggingface_hub.file_download | Xet Storage is enabled for this repo, but the 'hf_xet' package is not installed. Falling back to regular HTTP download. For better performance, install the package with: `pip install huggingface_hub[hf_xet]` or `pip install hf_xet`
+2026-03-24 00:45:30,452 | INFO | __main__ | Using attention backend: eager
+2026-03-24 00:45:30,452 | INFO | __main__ | Using device_map: cuda:0
+2026-03-24 00:51:01,942 | INFO | __main__ | Loading config from configs\train_qwen25_7b_laptop6gb_qlora.yaml
+2026-03-24 00:51:01,942 | INFO | __main__ | Artifacts will be saved under ./outputs/qwen25_7b_medqa_lora_laptop6gb
+2026-03-24 00:51:01,942 | INFO | __main__ | Text log file: ./outputs/qwen25_7b_medqa_lora_laptop6gb\logs\train.log
+2026-03-24 00:51:42,606 | INFO | __main__ | Using attention backend: sdpa
+2026-03-24 00:51:42,606 | INFO | __main__ | Using device_map: cuda:0
+2026-03-24 00:56:29,782 | INFO | __main__ | Loading config from configs\train_qwen25_7b_laptop6gb_qlora.yaml
+2026-03-24 00:56:29,782 | INFO | __main__ | Artifacts will be saved under ./outputs/qwen25_7b_medqa_lora_laptop6gb
+2026-03-24 00:56:29,782 | INFO | __main__ | Text log file: ./outputs/qwen25_7b_medqa_lora_laptop6gb\logs\train.log
+2026-03-24 00:57:05,391 | INFO | __main__ | Using attention backend: sdpa
+2026-03-24 00:57:05,391 | INFO | __main__ | Using device_map: cuda:0
+2026-03-24 01:00:04,916 | INFO | __main__ | Loading config from configs\train_qwen25_7b_laptop6gb_qlora.yaml
+2026-03-24 01:00:04,916 | INFO | __main__ | Artifacts will be saved under ./outputs/qwen25_7b_medqa_lora_laptop6gb
+2026-03-24 01:00:04,916 | INFO | __main__ | Text log file: ./outputs/qwen25_7b_medqa_lora_laptop6gb\logs\train.log
+2026-03-24 01:00:46,359 | INFO | __main__ | Using attention backend: sdpa
+2026-03-24 01:00:46,359 | INFO | __main__ | Using device_map: cuda:0
+2026-03-24 01:06:00,243 | INFO | __main__ | Loading config from configs\train_qwen25_7b_laptop6gb_qlora.yaml
+2026-03-24 01:06:00,243 | INFO | __main__ | Artifacts will be saved under ./outputs/qwen25_7b_medqa_lora_laptop6gb
+2026-03-24 01:06:00,243 | INFO | __main__ | Text log file: ./outputs/qwen25_7b_medqa_lora_laptop6gb\logs\train.log
+2026-03-24 01:06:46,967 | INFO | __main__ | Using attention backend: sdpa
+2026-03-24 01:06:46,967 | INFO | __main__ | Using device_map: cuda:0
+2026-03-24 01:09:12,114 | INFO | __main__ | Loading config from configs\train_qwen25_7b_laptop6gb_qlora.yaml
+2026-03-24 01:09:12,114 | INFO | __main__ | Artifacts will be saved under ./outputs/qwen25_7b_medqa_lora_laptop6gb
+2026-03-24 01:09:12,114 | INFO | __main__ | Text log file: ./outputs/qwen25_7b_medqa_lora_laptop6gb\logs\train.log
+2026-03-24 01:09:49,081 | INFO | __main__ | Using attention backend: sdpa
+2026-03-24 01:09:49,081 | INFO | __main__ | Using device_map: cuda:0
+2026-03-24 01:09:49,635 | INFO | __main__ | Train dataset columns: ['input_ids', 'attention_mask', 'labels']
+2026-03-24 01:09:49,635 | INFO | __main__ | Validation dataset columns: ['input_ids', 'attention_mask', 'labels']
+2026-03-24 02:27:18,231 | INFO | __main__ | Saved eval metrics to ./outputs/qwen25_7b_medqa_lora_laptop6gb\eval_metrics.yaml
+2026-03-24 02:27:18,232 | INFO | __main__ | Saved step metrics jsonl to ./outputs/qwen25_7b_medqa_lora_laptop6gb\logs\metrics.jsonl
+2026-03-24 02:27:18,232 | INFO | __main__ | Saved trainer log history to ./outputs/qwen25_7b_medqa_lora_laptop6gb\logs\trainer_log_history.json

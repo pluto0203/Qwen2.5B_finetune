@@ -76,6 +76,22 @@ def resolve_attention_backend(requested: str) -> str:
     return "sdpa"
 
 
+def resolve_device_map(requested):
+    if requested is None:
+        return "auto"
+
+    if isinstance(requested, int):
+        return f"cuda:{requested}"
+
+    if isinstance(requested, str):
+        value = requested.strip()
+        if value.isdigit():
+            return f"cuda:{value}"
+        return value
+
+    return requested
+
+
 def main() -> None:
     args = parse_args()
 
@@ -127,7 +143,7 @@ def main() -> None:
         tokenizer.pad_token = tokenizer.eos_token
 
     attn_backend = resolve_attention_backend(cfg["model"].get("attn_implementation", "sdpa"))
-    device_map = cfg["model"].get("device_map", "auto")
+    device_map = resolve_device_map(cfg["model"].get("device_map", "auto"))
 
     model = AutoModelForCausalLM.from_pretrained(
         model_name,
@@ -138,6 +154,7 @@ def main() -> None:
         attn_implementation=attn_backend,
     )
     logger.info("Using attention backend: %s", attn_backend)
+    logger.info("Using device_map: %s", device_map)
 
     if cfg["training"].get("gradient_checkpointing", True):
         model.config.use_cache = False
@@ -148,6 +165,8 @@ def main() -> None:
         answer_col=cfg["data"].get("answer_col", "Answer"),
         val_size=float(cfg["data"].get("val_size", 0.02)),
         seed=seed,
+        dedupe_on_answer=bool(cfg["data"].get("dedupe_on_answer", True)),
+        max_answer_chars=cfg["data"].get("max_answer_chars", 2000),
     )
 
     dataset = load_sft_dataset(
@@ -155,7 +174,19 @@ def main() -> None:
         config=data_cfg,
         system_prompt=cfg["data"]["system_prompt"],
         limit_rows=cfg["data"].get("limit_rows"),
+        max_seq_length=int(cfg["data"].get("max_seq_length", 2048)),
     )
+
+    keep_columns = {"input_ids", "attention_mask", "labels"}
+    for split_name in ["train", "validation"]:
+        split_ds = dataset[split_name]
+        drop_columns = [c for c in split_ds.column_names if c not in keep_columns]
+        if drop_columns:
+            split_ds = split_ds.remove_columns(drop_columns)
+        dataset[split_name] = split_ds
+
+    logger.info("Train dataset columns: %s", dataset["train"].column_names)
+    logger.info("Validation dataset columns: %s", dataset["validation"].column_names)
 
     lora_cfg = LoraConfig(
         r=int(cfg["lora"]["r"]),
@@ -184,13 +215,13 @@ def main() -> None:
         "save_total_limit": int(cfg["training"].get("save_total_limit", 3)),
         "lr_scheduler_type": cfg["training"].get("lr_scheduler_type", "cosine"),
         "max_seq_length": int(cfg["data"].get("max_seq_length", 2048)),
-        "packing": bool(cfg["data"].get("packing", False)),
+        # Dataset is already tokenized in src.data.load_sft_dataset.
+        "packing": False,
         "bf16": use_bf16,
         "fp16": use_fp16,
         "gradient_checkpointing": bool(cfg["training"].get("gradient_checkpointing", True)),
         "report_to": cfg["training"].get("report_to", "none"),
         "remove_unused_columns": False,
-        "dataset_text_field": "text",
     }
 
     optional_training_keys = [
@@ -208,6 +239,12 @@ def main() -> None:
         "max_grad_norm",
     ]
     available_fields = getattr(SFTConfig, "__dataclass_fields__", {})
+    if "dataset_text_field" in available_fields:
+        sft_kwargs["dataset_text_field"] = None
+
+    if "dataset_kwargs" in available_fields:
+        sft_kwargs["dataset_kwargs"] = {"skip_prepare_dataset": True}
+
     for key in optional_training_keys:
         if key in cfg["training"] and key in available_fields:
             sft_kwargs[key] = cfg["training"][key]
